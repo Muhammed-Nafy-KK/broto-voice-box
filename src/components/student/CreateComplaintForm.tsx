@@ -128,10 +128,10 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Submit New Complaint</CardTitle>
-        <CardDescription>
+    <Card className="shadow-xl border-2">
+      <CardHeader className="space-y-2">
+        <CardTitle className="text-2xl font-bold">Submit New Complaint</CardTitle>
+        <CardDescription className="text-base">
           Provide detailed information about your complaint
         </CardDescription>
       </CardHeader>
@@ -218,13 +218,18 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
           </div>
 
           <div className="flex gap-2">
-            <Button type="submit" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              disabled={isLoading}
+              className="shadow-md hover:shadow-lg transition-all"
+            >
               {isLoading ? "Submitting..." : "Submit Complaint"}
             </Button>
             <Button
               type="button"
               variant="outline"
               onClick={() => navigate("/student/dashboard")}
+              className="hover:bg-accent/5 transition-all"
             >
               Cancel
             </Button>

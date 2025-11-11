@@ -44,13 +44,14 @@ const CreateComplaint = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <header className="border-b bg-card">
+    <div className="min-h-screen bg-gradient-subtle">
+      <header className="border-b bg-card shadow-sm backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <Button 
             variant="ghost" 
             size="sm"
             onClick={() => navigate("/student/dashboard")}
+            className="hover:bg-accent/10 transition-all"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
