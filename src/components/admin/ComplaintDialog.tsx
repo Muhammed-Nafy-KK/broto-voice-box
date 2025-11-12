@@ -78,6 +78,31 @@ export const ComplaintDialog = ({
         message: logMessage,
       });
 
+      // Send email notification to student
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("email")
+          .eq("id", complaint.student_id)
+          .single();
+
+        if (profile?.email) {
+          await supabase.functions.invoke("send-complaint-email", {
+            body: {
+              complaintId: complaint.id,
+              studentEmail: profile.email,
+              studentName: complaint.student_name,
+              complaintTitle: complaint.title,
+              status: status,
+              adminRemarks: adminRemarks,
+            },
+          });
+        }
+      } catch (emailError) {
+        console.error("Failed to send email notification:", emailError);
+        // Don't fail the entire update if email fails
+      }
+
       toast.success("Complaint updated successfully!");
       onUpdate();
       onClose();

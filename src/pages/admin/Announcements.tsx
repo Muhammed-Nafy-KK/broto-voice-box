@@ -80,9 +80,22 @@ const AdminAnnouncements = () => {
         variant: "destructive",
       });
     } else {
+      // Send email notification to all users
+      try {
+        await supabase.functions.invoke("send-announcement-email", {
+          body: {
+            title,
+            message,
+          },
+        });
+      } catch (emailError) {
+        console.error("Failed to send email notifications:", emailError);
+        // Don't fail if email fails
+      }
+
       toast({
         title: "Success",
-        description: "Announcement created successfully",
+        description: "Announcement created and emails sent successfully",
       });
       setTitle("");
       setMessage("");
