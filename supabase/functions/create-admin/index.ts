@@ -23,31 +23,78 @@ serve(async (req) => {
       }
     );
 
-    // Create admin user
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email: 'admin@complaint-system.com',
-      password: 'Admin@123',
-      email_confirm: true,
-      user_metadata: {
-        full_name: 'System Admin',
-        role: 'admin'
-      }
-    });
+    const adminEmail = 'admin@complaint-system.com';
+    let userId: string;
+    let wasCreated = false;
 
-    if (authError) {
-      console.error('Error creating admin user:', authError);
-      return new Response(
-        JSON.stringify({ error: authError.message }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Check if user already exists
+    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
+    const existingUser = existingUsers?.users.find(u => u.email === adminEmail);
+
+    if (existingUser) {
+      console.log('Admin user already exists, updating role:', existingUser.id);
+      userId = existingUser.id;
+
+      // Update user metadata
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
+        user_metadata: {
+          full_name: 'System Admin',
+          role: 'admin'
+        }
+      });
+    } else {
+      // Create new admin user
+      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+        email: adminEmail,
+        password: 'Admin@123',
+        email_confirm: true,
+        user_metadata: {
+          full_name: 'System Admin',
+          role: 'admin'
+        }
+      });
+
+      if (authError) {
+        console.error('Error creating admin user:', authError);
+        return new Response(
+          JSON.stringify({ error: authError.message }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      userId = authData.user.id;
+      wasCreated = true;
+      console.log('Admin user created successfully:', userId);
     }
 
-    console.log('Admin user created successfully:', authData.user.id);
+    // Update or insert admin role in user_roles table
+    const { error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .upsert({ 
+        user_id: userId, 
+        role: 'admin' 
+      }, { 
+        onConflict: 'user_id,role' 
+      });
+
+    if (roleError) {
+      console.error('Error updating user role:', roleError);
+    }
+
+    // Update profile role
+    const { error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .update({ role: 'admin', full_name: 'System Admin' })
+      .eq('id', userId);
+
+    if (profileError) {
+      console.error('Error updating profile:', profileError);
+    }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Admin account created successfully',
+        message: wasCreated ? 'Admin account created successfully' : 'Admin role updated successfully',
         email: 'admin@complaint-system.com',
         password: 'Admin@123'
       }),
