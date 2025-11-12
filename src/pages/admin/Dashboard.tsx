@@ -168,7 +168,7 @@ const Dashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         {/* Quick Links */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <Button variant="outline" className="h-auto py-4" onClick={() => navigate("/admin/announcements")}>
             <div className="text-center">
               <h3 className="font-semibold">Announcements</h3>
@@ -179,6 +179,12 @@ const Dashboard = () => {
             <div className="text-center">
               <h3 className="font-semibold">Analytics</h3>
               <p className="text-xs text-muted-foreground">View insights & reports</p>
+            </div>
+          </Button>
+          <Button variant="outline" className="h-auto py-4" onClick={() => navigate("/admin/notifications")}>
+            <div className="text-center">
+              <h3 className="font-semibold">Notifications</h3>
+              <p className="text-xs text-muted-foreground">Email & SMS delivery logs</p>
             </div>
           </Button>
           <Button variant="outline" className="h-auto py-4" onClick={() => navigate("/admin/users")}>

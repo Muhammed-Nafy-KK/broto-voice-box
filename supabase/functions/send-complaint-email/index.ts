@@ -1,7 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.81.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
+const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,6 +29,7 @@ serve(async (req) => {
 
   try {
     const {
+      complaintId,
       studentEmail,
       studentName,
       complaintTitle,
@@ -34,6 +38,8 @@ serve(async (req) => {
     }: ComplaintEmailRequest = await req.json();
 
     console.log("Sending complaint email to:", studentEmail);
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -73,6 +79,17 @@ serve(async (req) => {
 
     console.log("Email sent successfully:", emailResponse);
 
+    // Log successful email send
+    await supabase.from("notification_logs").insert({
+      notification_type: "email",
+      recipient: studentEmail,
+      subject: `Complaint Update: ${complaintTitle}`,
+      content: emailHtml,
+      status: "sent",
+      related_complaint_id: complaintId,
+      metadata: { email_response: emailResponse },
+    });
+
     return new Response(JSON.stringify(emailResponse), {
       status: 200,
       headers: {
@@ -82,6 +99,25 @@ serve(async (req) => {
     });
   } catch (error: any) {
     console.error("Error in send-complaint-email function:", error);
+
+    // Log failed email send
+    try {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const body = await req.json().catch(() => ({}));
+      
+      await supabase.from("notification_logs").insert({
+        notification_type: "email",
+        recipient: body.studentEmail || "unknown",
+        subject: body.complaintTitle ? `Complaint Update: ${body.complaintTitle}` : "Complaint Update",
+        content: error.message,
+        status: "failed",
+        error_message: error.message,
+        related_complaint_id: body.complaintId,
+      });
+    } catch (logError) {
+      console.error("Failed to log email error:", logError);
+    }
+
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },

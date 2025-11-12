@@ -98,6 +98,22 @@ serve(async (req) => {
 
     console.log(`Emails sent: ${successful} successful, ${failed} failed`);
 
+    // Log all email results
+    const logPromises = results.map((result, index) => {
+      const profile = profiles[index];
+      return supabase.from("notification_logs").insert({
+        notification_type: "email",
+        recipient: profile.email,
+        subject: `📢 ${title}`,
+        content: emailHtml,
+        status: result.status === 'fulfilled' ? 'sent' : 'failed',
+        error_message: result.status === 'rejected' ? result.reason?.message : null,
+        metadata: { announcement_title: title },
+      });
+    });
+
+    await Promise.allSettled(logPromises);
+
     return new Response(
       JSON.stringify({ 
         message: "Announcement emails sent",

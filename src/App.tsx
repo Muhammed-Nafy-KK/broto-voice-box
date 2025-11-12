@@ -13,6 +13,7 @@ import StudentSuggestions from "./pages/student/Suggestions";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminAnnouncements from "./pages/admin/Announcements";
 import AdminAnalytics from "./pages/admin/Analytics";
+import AdminNotifications from "./pages/admin/Notifications";
 import UserManagement from "./pages/admin/UserManagement";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/announcements" element={<AdminAnnouncements />} />
           <Route path="/admin/analytics" element={<AdminAnalytics />} />
+          <Route path="/admin/notifications" element={<AdminNotifications />} />
           <Route path="/admin/users" element={<UserManagement />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

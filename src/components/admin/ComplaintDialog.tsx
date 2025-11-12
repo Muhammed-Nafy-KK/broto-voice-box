@@ -103,6 +103,28 @@ export const ComplaintDialog = ({
         // Don't fail the entire update if email fails
       }
 
+      // Send SMS notification if complaint is marked as urgent
+      if (complaint.marked_urgent) {
+        try {
+          // For SMS, we would need phone number stored in profile
+          // This is a placeholder - in production, add phone_number to profiles table
+          const phoneNumber = "+1234567890"; // Placeholder
+          
+          await supabase.functions.invoke("send-sms-notification", {
+            body: {
+              complaintId: complaint.id,
+              phoneNumber: phoneNumber,
+              studentName: complaint.student_name,
+              complaintTitle: complaint.title,
+              status: status,
+            },
+          });
+        } catch (smsError) {
+          console.error("Failed to send SMS notification:", smsError);
+          // Don't fail the entire update if SMS fails
+        }
+      }
+
       toast.success("Complaint updated successfully!");
       onUpdate();
       onClose();

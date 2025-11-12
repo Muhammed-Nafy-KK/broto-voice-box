@@ -154,6 +154,69 @@ export type Database = {
           },
         ]
       }
+      notification_logs: {
+        Row: {
+          content: string
+          created_at: string
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          notification_type: string
+          recipient: string
+          related_announcement_id: string | null
+          related_complaint_id: string | null
+          sent_by: string | null
+          status: string
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          notification_type: string
+          recipient: string
+          related_announcement_id?: string | null
+          related_complaint_id?: string | null
+          sent_by?: string | null
+          status: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          notification_type?: string
+          recipient?: string
+          related_announcement_id?: string | null
+          related_complaint_id?: string | null
+          sent_by?: string | null
+          status?: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_logs_related_announcement_id_fkey"
+            columns: ["related_announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_logs_related_complaint_id_fkey"
+            columns: ["related_complaint_id"]
+            isOneToOne: false
+            referencedRelation: "complaints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
