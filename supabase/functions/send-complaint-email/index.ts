@@ -99,25 +99,6 @@ serve(async (req) => {
     });
   } catch (error: any) {
     console.error("Error in send-complaint-email function:", error);
-
-    // Log failed email send
-    try {
-      const supabase = createClient(supabaseUrl, supabaseKey);
-      const body = await req.json().catch(() => ({}));
-      
-      await supabase.from("notification_logs").insert({
-        notification_type: "email",
-        recipient: body.studentEmail || "unknown",
-        subject: body.complaintTitle ? `Complaint Update: ${body.complaintTitle}` : "Complaint Update",
-        content: error.message,
-        status: "failed",
-        error_message: error.message,
-        related_complaint_id: body.complaintId,
-      });
-    } catch (logError) {
-      console.error("Failed to log email error:", logError);
-    }
-
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },

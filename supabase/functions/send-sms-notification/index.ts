@@ -88,24 +88,6 @@ serve(async (req) => {
     );
   } catch (error: any) {
     console.error("Error in send-sms-notification function:", error);
-
-    // Log failed SMS send
-    try {
-      const supabase = createClient(supabaseUrl, supabaseKey);
-      const body = await req.json().catch(() => ({}));
-      
-      await supabase.from("notification_logs").insert({
-        notification_type: "sms",
-        recipient: body.phoneNumber || "unknown",
-        content: error.message,
-        status: "failed",
-        error_message: error.message,
-        related_complaint_id: body.complaintId,
-      });
-    } catch (logError) {
-      console.error("Failed to log SMS error:", logError);
-    }
-
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },
