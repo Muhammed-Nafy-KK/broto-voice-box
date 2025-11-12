@@ -144,6 +144,28 @@ const Dashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Quick Links */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <Button variant="outline" className="h-auto py-4" onClick={() => navigate("/admin/announcements")}>
+            <div className="text-center">
+              <h3 className="font-semibold">Announcements</h3>
+              <p className="text-xs text-muted-foreground">Manage system announcements</p>
+            </div>
+          </Button>
+          <Button variant="outline" className="h-auto py-4" onClick={() => navigate("/admin/analytics")}>
+            <div className="text-center">
+              <h3 className="font-semibold">Analytics</h3>
+              <p className="text-xs text-muted-foreground">View insights & reports</p>
+            </div>
+          </Button>
+          <Button variant="outline" className="h-auto py-4" onClick={() => navigate("/admin/users")}>
+            <div className="text-center">
+              <h3 className="font-semibold">User Management</h3>
+              <p className="text-xs text-muted-foreground">Manage users & roles</p>
+            </div>
+          </Button>
+        </div>
+
         <div className="mb-6">
           <h2 className="text-xl font-semibold mb-4">All Complaints</h2>
           

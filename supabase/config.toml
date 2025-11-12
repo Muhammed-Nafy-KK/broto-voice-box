@@ -2,3 +2,9 @@ project_id = "pgguejgjpxjqxntlwdck"
 
 [functions.create-admin]
 verify_jwt = false
+
+[functions.analyze-complaint]
+verify_jwt = false
+
+[functions.get-admin-insights]
+verify_jwt = true
