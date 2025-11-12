@@ -129,8 +129,8 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
 
   return (
     <Card className="shadow-xl border-2">
-      <CardHeader className="space-y-2">
-        <CardTitle className="text-2xl font-bold">Submit New Complaint</CardTitle>
+      <CardHeader className="space-y-3 pb-8">
+        <CardTitle className="text-3xl font-bold tracking-tight">Submit New Complaint</CardTitle>
         <CardDescription className="text-base">
           Provide detailed information about your complaint
         </CardDescription>
@@ -138,7 +138,7 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Title *</Label>
+            <Label htmlFor="title" className="text-base font-medium">Title *</Label>
             <Input
               id="title"
               placeholder="Brief description of your complaint"
@@ -146,14 +146,15 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
               onChange={(e) => setTitle(e.target.value)}
               maxLength={120}
               required
+              className="h-12 text-base"
             />
             <p className="text-xs text-muted-foreground">{title.length}/120 characters</p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category">Category *</Label>
+            <Label htmlFor="category" className="text-base font-medium">Category *</Label>
             <Select value={category} onValueChange={(value) => setCategory(value as ComplaintCategory)}>
-              <SelectTrigger>
+              <SelectTrigger className="h-12 text-base">
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
@@ -167,15 +168,16 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description *</Label>
+            <Label htmlFor="description" className="text-base font-medium">Description *</Label>
             <Textarea
               id="description"
               placeholder="Provide detailed information about your complaint..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               maxLength={5000}
-              rows={6}
+              rows={8}
               required
+              className="text-base resize-none"
             />
             <p className="text-xs text-muted-foreground">{description.length}/5000 characters</p>
           </div>
@@ -217,11 +219,12 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-3 pt-4">
             <Button 
               type="submit" 
               disabled={isLoading}
-              className="shadow-md hover:shadow-lg transition-all"
+              size="lg"
+              className="flex-1 font-semibold shadow-md hover:shadow-lg transition-all"
             >
               {isLoading ? "Submitting..." : "Submit Complaint"}
             </Button>
@@ -229,7 +232,8 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
               type="button"
               variant="outline"
               onClick={() => navigate("/student/dashboard")}
-              className="hover:bg-accent/5 transition-all"
+              size="lg"
+              className="flex-1 font-semibold hover:bg-accent/5 transition-all"
             >
               Cancel
             </Button>
