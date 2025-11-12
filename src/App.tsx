@@ -9,7 +9,11 @@ import Setup from "./pages/Setup";
 import StudentDashboard from "./pages/student/Dashboard";
 import CreateComplaint from "./pages/student/CreateComplaint";
 import ComplaintDetail from "./pages/student/ComplaintDetail";
+import StudentSuggestions from "./pages/student/Suggestions";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminAnnouncements from "./pages/admin/Announcements";
+import AdminAnalytics from "./pages/admin/Analytics";
+import UserManagement from "./pages/admin/UserManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,7 +31,11 @@ const App = () => (
           <Route path="/student/dashboard" element={<StudentDashboard />} />
           <Route path="/student/create-complaint" element={<CreateComplaint />} />
           <Route path="/student/complaint/:id" element={<ComplaintDetail />} />
+          <Route path="/student/suggestions" element={<StudentSuggestions />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/announcements" element={<AdminAnnouncements />} />
+          <Route path="/admin/analytics" element={<AdminAnalytics />} />
+          <Route path="/admin/users" element={<UserManagement />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

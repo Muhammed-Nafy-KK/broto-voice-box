@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Sparkles } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 
 type ComplaintCategory = Database["public"]["Enums"]["complaint_category"];
@@ -38,11 +39,39 @@ interface CreateComplaintFormProps {
 
 export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<ComplaintCategory | "">("");
+  const [markedUrgent, setMarkedUrgent] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState<string>("");
   const [attachment, setAttachment] = useState<File | null>(null);
   const navigate = useNavigate();
+
+  const analyzeWithAI = async () => {
+    if (!title || !description) {
+      toast.error("Please enter title and description first");
+      return;
+    }
+
+    setIsAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-complaint', {
+        body: { title, description }
+      });
+
+      if (error) throw error;
+
+      setCategory(data.category as ComplaintCategory);
+      setAiSuggestion(`AI detected: ${data.category} (${data.sentiment} tone)`);
+      toast.success(`AI Suggestion: ${data.category} category`);
+    } catch (error: any) {
+      console.error('AI analysis error:', error);
+      toast.error("AI analysis unavailable, please select category manually");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -89,7 +118,7 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
         attachmentUrl = publicUrl;
       }
 
-      // Create complaint
+      // Create complaint with AI-enhanced data
       const { data: complaintData, error: complaintError } = await supabase
         .from("complaints")
         .insert({
@@ -100,7 +129,9 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
           description,
           category: category as ComplaintCategory,
           attachment_url: attachmentUrl,
-        })
+          marked_urgent: markedUrgent,
+          priority: markedUrgent ? 'urgent' : 'medium',
+        } as any)
         .select()
         .single();
 
@@ -152,7 +183,19 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category" className="text-base font-medium">Category *</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="category" className="text-base font-medium">Category *</Label>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm" 
+                onClick={analyzeWithAI}
+                disabled={isAnalyzing || !title || !description}
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                {isAnalyzing ? "Analyzing..." : "AI Suggest"}
+              </Button>
+            </div>
             <Select value={category} onValueChange={(value) => setCategory(value as ComplaintCategory)}>
               <SelectTrigger className="h-12 text-base">
                 <SelectValue placeholder="Select a category" />
@@ -165,6 +208,9 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
                 ))}
               </SelectContent>
             </Select>
+            {aiSuggestion && (
+              <p className="text-xs text-primary">{aiSuggestion}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -180,6 +226,20 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
               className="text-base resize-none"
             />
             <p className="text-xs text-muted-foreground">{description.length}/5000 characters</p>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="urgent" 
+              checked={markedUrgent}
+              onCheckedChange={(checked) => setMarkedUrgent(checked as boolean)}
+            />
+            <Label 
+              htmlFor="urgent" 
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Mark as Urgent (requires immediate attention)
+            </Label>
           </div>
 
           <div className="space-y-2">

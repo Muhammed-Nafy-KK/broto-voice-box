@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ComplaintCard } from "@/components/student/ComplaintCard";
+import { AnnouncementBanner } from "@/components/student/AnnouncementBanner";
 import { Database } from "@/integrations/supabase/types";
-import { Plus, LogOut } from "lucide-react";
+import { Plus, LogOut, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 
 type Complaint = Database["public"]["Tables"]["complaints"]["Row"];
@@ -84,18 +85,26 @@ const Dashboard = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
+      <main className="container mx-auto px-4 py-8 space-y-6">
+        <AnnouncementBanner />
+        
+        <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold">My Complaints</h2>
             <p className="text-sm text-muted-foreground">
               {complaints.length} {complaints.length === 1 ? "complaint" : "complaints"}
             </p>
           </div>
-          <Button onClick={() => navigate("/student/create-complaint")}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Complaint
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate("/student/suggestions")}>
+              <Lightbulb className="h-4 w-4 mr-2" />
+              Suggestions
+            </Button>
+            <Button onClick={() => navigate("/student/create-complaint")}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Complaint
+            </Button>
+          </div>
         </div>
 
         {complaints.length === 0 ? (
