@@ -9,6 +9,7 @@ import { ComplaintDialog } from "@/components/admin/ComplaintDialog";
 import { Database } from "@/integrations/supabase/types";
 import { LogOut, Search, Filter } from "lucide-react";
 import { toast } from "sonner";
+import { useRealtimeNotifications } from "@/hooks/use-realtime-notifications";
 
 type Complaint = Database["public"]["Tables"]["complaints"]["Row"];
 type ComplaintStatus = Database["public"]["Enums"]["complaint_status"];
@@ -30,8 +31,30 @@ const Dashboard = () => {
   
   const navigate = useNavigate();
 
+  useRealtimeNotifications(adminId, 'admin');
+
   useEffect(() => {
     fetchComplaints();
+
+    // Subscribe to realtime updates for all complaints
+    const complaintChannel = supabase
+      .channel('admin-complaint-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'complaints',
+        },
+        () => {
+          fetchComplaints();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(complaintChannel);
+    };
   }, []);
 
   useEffect(() => {

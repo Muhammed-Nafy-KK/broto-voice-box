@@ -56,46 +56,91 @@ export type Database = {
           },
         ]
       }
+      announcements: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          message: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          message: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          message?: string
+          title?: string
+        }
+        Relationships: []
+      }
       complaints: {
         Row: {
           admin_remarks: string | null
+          ai_category: string | null
+          ai_sentiment: string | null
           attachment_url: string | null
           category: Database["public"]["Enums"]["complaint_category"]
           complaint_id: string
           created_at: string
           description: string
           id: string
+          marked_urgent: boolean | null
+          priority: string | null
           status: Database["public"]["Enums"]["complaint_status"]
           student_id: string
           student_name: string
+          tags: string[] | null
           title: string
           updated_at: string
         }
         Insert: {
           admin_remarks?: string | null
+          ai_category?: string | null
+          ai_sentiment?: string | null
           attachment_url?: string | null
           category: Database["public"]["Enums"]["complaint_category"]
           complaint_id: string
           created_at?: string
           description: string
           id?: string
+          marked_urgent?: boolean | null
+          priority?: string | null
           status?: Database["public"]["Enums"]["complaint_status"]
           student_id: string
           student_name: string
+          tags?: string[] | null
           title: string
           updated_at?: string
         }
         Update: {
           admin_remarks?: string | null
+          ai_category?: string | null
+          ai_sentiment?: string | null
           attachment_url?: string | null
           category?: Database["public"]["Enums"]["complaint_category"]
           complaint_id?: string
           created_at?: string
           description?: string
           id?: string
+          marked_urgent?: boolean | null
+          priority?: string | null
           status?: Database["public"]["Enums"]["complaint_status"]
           student_id?: string
           student_name?: string
+          tags?: string[] | null
           title?: string
           updated_at?: string
         }
@@ -133,6 +178,45 @@ export type Database = {
           id?: string
           profile_image?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+        }
+        Relationships: []
+      }
+      suggestions: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          description: string
+          id: string
+          status: string | null
+          student_id: string
+          student_name: string
+          title: string
+          updated_at: string
+          upvotes: number | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          status?: string | null
+          student_id: string
+          student_name: string
+          title: string
+          updated_at?: string
+          upvotes?: number | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          status?: string | null
+          student_id?: string
+          student_name?: string
+          title?: string
+          updated_at?: string
+          upvotes?: number | null
         }
         Relationships: []
       }

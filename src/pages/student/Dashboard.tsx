@@ -7,6 +7,7 @@ import { AnnouncementBanner } from "@/components/student/AnnouncementBanner";
 import { Database } from "@/integrations/supabase/types";
 import { Plus, LogOut, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
+import { useRealtimeNotifications } from "@/hooks/use-realtime-notifications";
 
 type Complaint = Database["public"]["Tables"]["complaints"]["Row"];
 
@@ -14,11 +15,35 @@ const Dashboard = () => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState("");
+  const [userId, setUserId] = useState("");
   const navigate = useNavigate();
+
+  useRealtimeNotifications(userId, 'student');
 
   useEffect(() => {
     fetchComplaints();
-  }, []);
+
+    // Subscribe to realtime updates for complaints
+    const complaintChannel = supabase
+      .channel('complaint-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'complaints',
+          filter: `student_id=eq.${userId}`,
+        },
+        () => {
+          fetchComplaints();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(complaintChannel);
+    };
+  }, [userId]);
 
   const fetchComplaints = async () => {
     try {
@@ -27,6 +52,8 @@ const Dashboard = () => {
         navigate("/auth");
         return;
       }
+
+      setUserId(user.id);
 
       // Get user profile
       const { data: profile } = await supabase
