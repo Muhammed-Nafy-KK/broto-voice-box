@@ -45,13 +45,13 @@ const CreateComplaint = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <header className="border-b bg-card shadow-sm backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4">
+      <header className="border-b bg-card shadow-md">
+        <div className="container mx-auto px-4 py-6">
           <Button 
             variant="ghost" 
             size="sm"
             onClick={() => navigate("/student/dashboard")}
-            className="hover:bg-accent/10 transition-all"
+            className="hover:bg-secondary transition-all"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
@@ -59,7 +59,7 @@ const CreateComplaint = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-3xl">
+      <main className="container mx-auto px-4 py-12 max-w-3xl">
         <CreateComplaintForm userId={userId} userName={userName} />
       </main>
     </div>
