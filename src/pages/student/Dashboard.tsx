@@ -106,7 +106,7 @@ const Dashboard = () => {
             <p className="text-sm text-muted-foreground">Welcome, {userName}</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/student/settings")}>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/student/profile-settings")}>
               <Settings className="h-4 w-4 mr-2" />
               Settings
             </Button>
