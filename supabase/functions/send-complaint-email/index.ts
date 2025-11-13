@@ -71,7 +71,7 @@ serve(async (req) => {
     `;
 
     const emailResponse = await resend.emails.send({
-      from: "Grievance System <onboarding@resend.dev>",
+      from: "Grievance System <noreply@brotorise.example.com>",
       to: [studentEmail],
       subject: `Complaint Update: ${complaintTitle}`,
       html: emailHtml,

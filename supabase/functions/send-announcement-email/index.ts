@@ -84,7 +84,7 @@ serve(async (req) => {
     // Send emails to all users
     const emailPromises = profiles.map((profile) =>
       resend.emails.send({
-        from: "Grievance System <onboarding@resend.dev>",
+        from: "Grievance System <noreply@brotorise.example.com>",
         to: [profile.email],
         subject: `📢 ${title}`,
         html: emailHtml,

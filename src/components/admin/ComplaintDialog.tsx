@@ -106,19 +106,26 @@ export const ComplaintDialog = ({
       // Send SMS notification if complaint is marked as urgent
       if (complaint.marked_urgent) {
         try {
-          // For SMS, we would need phone number stored in profile
-          // This is a placeholder - in production, add phone_number to profiles table
-          const phoneNumber = "+1234567890"; // Placeholder
-          
-          await supabase.functions.invoke("send-sms-notification", {
-            body: {
-              complaintId: complaint.id,
-              phoneNumber: phoneNumber,
-              studentName: complaint.student_name,
-              complaintTitle: complaint.title,
-              status: status,
-            },
-          });
+          // Get phone number from profile
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("phone_number")
+            .eq("id", complaint.student_id)
+            .single();
+
+          if (profile?.phone_number) {
+            await supabase.functions.invoke("send-sms-notification", {
+              body: {
+                complaintId: complaint.id,
+                phoneNumber: profile.phone_number,
+                studentName: complaint.student_name,
+                complaintTitle: complaint.title,
+                status: status,
+              },
+            });
+          } else {
+            console.log("No phone number found for user, skipping SMS");
+          }
         } catch (smsError) {
           console.error("Failed to send SMS notification:", smsError);
           // Don't fail the entire update if SMS fails
