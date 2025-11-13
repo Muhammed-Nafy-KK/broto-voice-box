@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.detect-spam-complaint]
 verify_jwt = false
+
+[functions.make-emergency-call]
+verify_jwt = false

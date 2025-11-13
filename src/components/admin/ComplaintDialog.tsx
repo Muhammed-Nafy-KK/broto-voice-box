@@ -9,7 +9,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Database } from "@/integrations/supabase/types";
-import { Calendar, FileText } from "lucide-react";
+import { Calendar, FileText, Phone } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -113,11 +113,11 @@ export const ComplaintDialog = ({
             .eq("id", complaint.student_id)
             .single();
 
-          if (profile?.phone_number) {
+          if ((profile as any)?.phone_number) {
             await supabase.functions.invoke("send-sms-notification", {
               body: {
                 complaintId: complaint.id,
-                phoneNumber: profile.phone_number,
+                phoneNumber: (profile as any).phone_number,
                 studentName: complaint.student_name,
                 complaintTitle: complaint.title,
                 status: status,
@@ -141,6 +141,38 @@ export const ComplaintDialog = ({
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleEmergencyCall = async () => {
+    try {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('phone_number')
+        .eq('id', complaint.student_id)
+        .single();
+
+      const phoneNumber = (profileData as any)?.phone_number;
+      
+      if (!phoneNumber) {
+        toast.error("Student's phone number not available");
+        return;
+      }
+
+      const { error } = await supabase.functions.invoke('make-emergency-call', {
+        body: {
+          phoneNumber: phoneNumber,
+          complaintId: complaint.complaint_id,
+          complaintTitle: complaint.title
+        }
+      });
+
+      if (error) throw error;
+
+      toast.success("Emergency call initiated");
+    } catch (error: any) {
+      console.error('Error making emergency call:', error);
+      toast.error(error.message || "Failed to initiate emergency call");
     }
   };
 
@@ -227,6 +259,16 @@ export const ComplaintDialog = ({
           </div>
 
           <div className="flex gap-2 justify-end">
+            {complaint.priority === 'urgent' && (
+              <Button 
+                onClick={handleEmergencyCall}
+                variant="destructive"
+                size="sm"
+              >
+                <Phone className="h-4 w-4 mr-2" />
+                Emergency Call
+              </Button>
+            )}
             <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
