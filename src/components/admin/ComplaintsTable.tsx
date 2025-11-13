@@ -3,6 +3,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { Badge } from "@/components/ui/badge";
 import { Database } from "@/integrations/supabase/types";
 import { format } from "date-fns";
+import { AlertTriangle } from "lucide-react";
 
 type Complaint = Database["public"]["Tables"]["complaints"]["Row"];
 
@@ -22,6 +23,7 @@ export const ComplaintsTable = ({ complaints, onComplaintClick }: ComplaintsTabl
             <TableHead>Category</TableHead>
             <TableHead>Student</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Priority</TableHead>
             <TableHead>Created</TableHead>
             <TableHead>Updated</TableHead>
           </TableRow>
@@ -37,7 +39,7 @@ export const ComplaintsTable = ({ complaints, onComplaintClick }: ComplaintsTabl
             complaints.map((complaint) => (
               <TableRow
                 key={complaint.id}
-                className="cursor-pointer hover:bg-muted/50"
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
                 onClick={() => onComplaintClick(complaint)}
               >
                 <TableCell className="font-mono text-xs">
@@ -54,6 +56,18 @@ export const ComplaintsTable = ({ complaints, onComplaintClick }: ComplaintsTabl
                 <TableCell>{complaint.student_name}</TableCell>
                 <TableCell>
                   <StatusBadge status={complaint.status} />
+                </TableCell>
+                <TableCell>
+                  {(complaint as any).is_urgent ? (
+                    <Badge className="bg-destructive text-destructive-foreground hover:bg-destructive/90 gap-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      Urgent
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary" className="text-xs">
+                      Normal
+                    </Badge>
+                  )}
                 </TableCell>
                 <TableCell className="text-xs text-muted-foreground">
                   {format(new Date(complaint.created_at), "MMM dd, yyyy")}

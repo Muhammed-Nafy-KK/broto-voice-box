@@ -4,10 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 import { ComplaintsTable } from "@/components/admin/ComplaintsTable";
 import { ComplaintDialog } from "@/components/admin/ComplaintDialog";
 import { Database } from "@/integrations/supabase/types";
-import { LogOut, Search, Filter } from "lucide-react";
+import { LogOut, Search, Filter, FileText, Clock, AlertCircle, CheckCircle, Megaphone, BarChart3, Bell, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useRealtimeNotifications } from "@/hooks/use-realtime-notifications";
 
@@ -153,13 +154,13 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-5 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">BrotoRaise Admin</h1>
-            <p className="text-sm text-muted-foreground">Welcome, {userName}</p>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">BrotoRaise Admin</h1>
+            <p className="text-sm text-muted-foreground mt-1">Welcome back, {userName}</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
+          <Button variant="ghost" size="sm" onClick={handleLogout} className="hover:bg-destructive/10 hover:text-destructive transition-colors">
             <LogOut className="h-4 w-4 mr-2" />
             Logout
           </Button>
@@ -168,102 +169,175 @@ const Dashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         {/* Quick Links */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Button variant="outline" className="h-auto py-4" onClick={() => navigate("/admin/announcements")}>
-            <div className="text-center">
-              <h3 className="font-semibold">Announcements</h3>
-              <p className="text-xs text-muted-foreground">Manage system announcements</p>
-            </div>
-          </Button>
-          <Button variant="outline" className="h-auto py-4" onClick={() => navigate("/admin/analytics")}>
-            <div className="text-center">
-              <h3 className="font-semibold">Analytics</h3>
-              <p className="text-xs text-muted-foreground">View insights & reports</p>
-            </div>
-          </Button>
-          <Button variant="outline" className="h-auto py-4" onClick={() => navigate("/admin/notifications")}>
-            <div className="text-center">
-              <h3 className="font-semibold">Notifications</h3>
-              <p className="text-xs text-muted-foreground">Email & SMS delivery logs</p>
-            </div>
-          </Button>
-          <Button variant="outline" className="h-auto py-4" onClick={() => navigate("/admin/users")}>
-            <div className="text-center">
-              <h3 className="font-semibold">User Management</h3>
-              <p className="text-xs text-muted-foreground">Manage users & roles</p>
-            </div>
-          </Button>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group" onClick={() => navigate("/admin/announcements")}>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <Megaphone className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">Announcements</h3>
+                  <p className="text-xs text-muted-foreground">Manage announcements</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group" onClick={() => navigate("/admin/analytics")}>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-lg bg-success/10 group-hover:bg-success/20 transition-colors">
+                  <BarChart3 className="h-6 w-6 text-success" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">Analytics</h3>
+                  <p className="text-xs text-muted-foreground">View insights</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group" onClick={() => navigate("/admin/notifications")}>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-lg bg-warning/10 group-hover:bg-warning/20 transition-colors">
+                  <Bell className="h-6 w-6 text-warning" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">Notifications</h3>
+                  <p className="text-xs text-muted-foreground">Delivery logs</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group" onClick={() => navigate("/admin/users")}>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-lg bg-info/10 group-hover:bg-info/20 transition-colors">
+                  <Users className="h-6 w-6 text-info" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">Users</h3>
+                  <p className="text-xs text-muted-foreground">Manage users</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">All Complaints</h2>
-          
-          {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by title, student, or ID..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold">Complaints Overview</h2>
+              <p className="text-sm text-muted-foreground mt-1">Manage and track all complaints</p>
             </div>
-            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as ComplaintStatus | "all")}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
-                <SelectItem value="In Review">In Review</SelectItem>
-                <SelectItem value="Resolved">Resolved</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as ComplaintCategory | "all")}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="Academic">Academic</SelectItem>
-                <SelectItem value="Infrastructure">Infrastructure</SelectItem>
-                <SelectItem value="Hostel">Hostel</SelectItem>
-                <SelectItem value="Food">Food</SelectItem>
-                <SelectItem value="Faculty">Faculty</SelectItem>
-                <SelectItem value="Administration">Administration</SelectItem>
-                <SelectItem value="Technical">Technical</SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
-
+          
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-card rounded-lg p-4 border">
-              <p className="text-sm text-muted-foreground">Total</p>
-              <p className="text-2xl font-bold">{complaints.length}</p>
-            </div>
-            <div className="bg-card rounded-lg p-4 border">
-              <p className="text-sm text-muted-foreground">Pending</p>
-              <p className="text-2xl font-bold">
-                {complaints.filter((c) => c.status === "Pending").length}
-              </p>
-            </div>
-            <div className="bg-card rounded-lg p-4 border">
-              <p className="text-sm text-muted-foreground">In Review</p>
-              <p className="text-2xl font-bold">
-                {complaints.filter((c) => c.status === "In Review").length}
-              </p>
-            </div>
-            <div className="bg-card rounded-lg p-4 border">
-              <p className="text-sm text-muted-foreground">Resolved</p>
-              <p className="text-2xl font-bold">
-                {complaints.filter((c) => c.status === "Resolved").length}
-              </p>
-            </div>
+            <Card className="border-l-4 border-l-primary hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Total Complaints</p>
+                    <p className="text-3xl font-bold mt-2">{complaints.length}</p>
+                  </div>
+                  <div className="p-3 rounded-full bg-primary/10">
+                    <FileText className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-warning hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Pending</p>
+                    <p className="text-3xl font-bold mt-2">
+                      {complaints.filter((c) => c.status === "Pending").length}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-full bg-warning/10">
+                    <Clock className="h-6 w-6 text-warning" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-info hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">In Review</p>
+                    <p className="text-3xl font-bold mt-2">
+                      {complaints.filter((c) => c.status === "In Review").length}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-full bg-info/10">
+                    <AlertCircle className="h-6 w-6 text-info" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-success hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Resolved</p>
+                    <p className="text-3xl font-bold mt-2">
+                      {complaints.filter((c) => c.status === "Resolved").length}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-full bg-success/10">
+                    <CheckCircle className="h-6 w-6 text-success" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
+
+          {/* Filters */}
+          <Card className="mb-6">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by title, student, or ID..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as ComplaintStatus | "all")}>
+                  <SelectTrigger className="w-full sm:w-[180px]">
+                    <Filter className="h-4 w-4 mr-2" />
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="Pending">Pending</SelectItem>
+                    <SelectItem value="In Review">In Review</SelectItem>
+                    <SelectItem value="Resolved">Resolved</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as ComplaintCategory | "all")}>
+                  <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="Academic">Academic</SelectItem>
+                    <SelectItem value="Infrastructure">Infrastructure</SelectItem>
+                    <SelectItem value="Hostel">Hostel</SelectItem>
+                    <SelectItem value="Food">Food</SelectItem>
+                    <SelectItem value="Faculty">Faculty</SelectItem>
+                    <SelectItem value="Administration">Administration</SelectItem>
+                    <SelectItem value="Technical">Technical</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <ComplaintsTable
