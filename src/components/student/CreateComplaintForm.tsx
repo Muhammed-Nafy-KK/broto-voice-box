@@ -98,6 +98,23 @@ export const CreateComplaintForm = ({ userId, userName }: CreateComplaintFormPro
       complaintSchema.parse({ title, description, category });
       setIsLoading(true);
 
+      // Check for spam using AI
+      const { data: spamCheck, error: spamError } = await supabase.functions.invoke('detect-spam-complaint', {
+        body: { title, description }
+      });
+
+      if (spamError) {
+        console.error('Spam detection error:', spamError);
+        // Continue even if spam detection fails
+      } else if (spamCheck?.is_spam) {
+        toast.error(
+          `Your complaint appears to be invalid: ${spamCheck.reason}. Please provide meaningful information.`,
+          { duration: 6000 }
+        );
+        setIsLoading(false);
+        return;
+      }
+
       let attachmentUrl = null;
 
       // Upload attachment if provided

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ComplaintCard } from "@/components/student/ComplaintCard";
 import { AnnouncementBanner } from "@/components/student/AnnouncementBanner";
 import { Database } from "@/integrations/supabase/types";
-import { Plus, LogOut, Lightbulb } from "lucide-react";
+import { Plus, LogOut, Lightbulb, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { useRealtimeNotifications } from "@/hooks/use-realtime-notifications";
 
@@ -105,10 +105,16 @@ const Dashboard = () => {
             <h1 className="text-2xl font-bold">BrotoRaise</h1>
             <p className="text-sm text-muted-foreground">Welcome, {userName}</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/student/settings")}>
+              <Settings className="h-4 w-4 mr-2" />
+              Settings
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
 
