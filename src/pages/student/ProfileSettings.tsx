@@ -35,9 +35,9 @@ export default function ProfileSettings() {
       if (error) throw error;
       if (data) {
         setProfile({
-          full_name: data.full_name || "",
-          email: data.email || "",
-          phone_number: data.phone_number || "",
+          full_name: (data as any).full_name || "",
+          email: (data as any).email || "",
+          phone_number: (data as any).phone_number || "",
         });
       }
     } catch (error) {
