@@ -223,24 +223,63 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          phone_number: string | null
           profile_image: string | null
           role: Database["public"]["Enums"]["user_role"]
+          student_id: string | null
         }
         Insert: {
           created_at?: string
           email: string
           full_name: string
           id: string
+          phone_number?: string | null
           profile_image?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          student_id?: string | null
         }
         Update: {
           created_at?: string
           email?: string
           full_name?: string
           id?: string
+          phone_number?: string | null
           profile_image?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          student_id?: string | null
+        }
+        Relationships: []
+      }
+      student_ids: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          student_id: string
+          student_name: string | null
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          student_id: string
+          student_name?: string | null
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          student_id?: string
+          student_name?: string | null
+          used_at?: string | null
+          used_by?: string | null
         }
         Relationships: []
       }

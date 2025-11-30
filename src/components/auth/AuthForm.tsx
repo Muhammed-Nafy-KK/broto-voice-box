@@ -13,6 +13,7 @@ const authSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   fullName: z.string().min(2, "Full name must be at least 2 characters").optional(),
+  studentId: z.string().min(1, "Student ID is required").optional(),
 });
 
 export const AuthForm = () => {
@@ -20,14 +21,30 @@ export const AuthForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [studentId, setStudentId] = useState("");
   const navigate = useNavigate();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      authSchema.parse({ email, password, fullName });
+      authSchema.parse({ email, password, fullName, studentId });
       setIsLoading(true);
+
+      // Validate student ID
+      const { data: validId, error: idError } = await supabase
+        .from("student_ids")
+        .select("*")
+        .eq("student_id", studentId)
+        .eq("is_active", true)
+        .is("used_by", null)
+        .single();
+
+      if (idError || !validId) {
+        toast.error("Invalid or already used Student ID");
+        setIsLoading(false);
+        return;
+      }
 
       const { error } = await supabase.auth.signUp({
         email,
@@ -37,16 +54,24 @@ export const AuthForm = () => {
           data: {
             full_name: fullName,
             role: "student",
+            student_id: studentId,
           },
         },
       });
 
       if (error) throw error;
 
+      // Mark student ID as used
+      await supabase
+        .from("student_ids")
+        .update({ used_by: email, used_at: new Date().toISOString() })
+        .eq("student_id", studentId);
+
       toast.success("Account created successfully! Please log in.");
       setEmail("");
       setPassword("");
       setFullName("");
+      setStudentId("");
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
@@ -129,6 +154,17 @@ export const AuthForm = () => {
             </TabsContent>
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="signup-student-id">Student ID</Label>
+                  <Input
+                    id="signup-student-id"
+                    type="text"
+                    placeholder="STU001"
+                    value={studentId}
+                    onChange={(e) => setStudentId(e.target.value)}
+                    required
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-name">Full Name</Label>
                   <Input

@@ -160,10 +160,22 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">BrotoRaise Admin</h1>
             <p className="text-sm text-muted-foreground mt-1">Welcome back, {userName}</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout} className="hover:bg-destructive/10 hover:text-destructive transition-colors">
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              {complaints.filter((c) => c.status === "Pending" && c.marked_urgent).length > 0 && (
+                <div className="relative">
+                  <Bell className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer" />
+                  <span className="absolute -top-1 -right-1 h-5 w-5 bg-destructive text-destructive-foreground text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                    {complaints.filter((c) => c.status === "Pending" && c.marked_urgent).length}
+                  </span>
+                </div>
+              )}
+            </div>
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="hover:bg-destructive/10 hover:text-destructive transition-colors">
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -218,6 +230,22 @@ const Dashboard = () => {
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg">Users</h3>
                   <p className="text-xs text-muted-foreground">Manage users</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8">
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group" onClick={() => navigate("/admin/student-ids")}>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <Users className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">Student IDs</h3>
+                  <p className="text-xs text-muted-foreground">Manage student IDs for signup</p>
                 </div>
               </div>
             </CardContent>
