@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Upload } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -26,7 +26,9 @@ const StudentIds = () => {
   const [newStudentId, setNewStudentId] = useState("");
   const [newStudentName, setNewStudentName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -99,6 +101,74 @@ const StudentIds = () => {
     }
   };
 
+  const handleCSVUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsLoading(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Unauthorized");
+        return;
+      }
+
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      // Skip header if present
+      const startIndex = lines[0].toLowerCase().includes('student') ? 1 : 0;
+      const studentIdsToInsert = [];
+
+      for (let i = startIndex; i < lines.length; i++) {
+        const [studentId, studentName] = lines[i].split(',').map(s => s.trim());
+        if (studentId) {
+          studentIdsToInsert.push({
+            student_id: studentId,
+            student_name: studentName || null,
+            created_by: user.id,
+          });
+        }
+      }
+
+      if (studentIdsToInsert.length === 0) {
+        toast.error("No valid student IDs found in CSV");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("student_ids")
+        .insert(studentIdsToInsert);
+
+      if (error) throw error;
+
+      toast.success(`Successfully imported ${studentIdsToInsert.length} student IDs`);
+      setIsBulkDialogOpen(false);
+      fetchStudentIds();
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+    } finally {
+      setIsLoading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const downloadTemplate = () => {
+    const csvContent = "student_id,student_name\nSTU001,John Doe\nSTU002,Jane Smith";
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'student_ids_template.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -109,43 +179,89 @@ const StudentIds = () => {
             </Button>
             <h1 className="text-3xl font-bold">Student ID Management</h1>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Student ID
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Student ID</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleAddStudentId} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="student-id">Student ID</Label>
-                  <Input
-                    id="student-id"
-                    placeholder="STU001"
-                    value={newStudentId}
-                    onChange={(e) => setNewStudentId(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="student-name">Student Name (Optional)</Label>
-                  <Input
-                    id="student-name"
-                    placeholder="John Doe"
-                    value={newStudentName}
-                    onChange={(e) => setNewStudentName(e.target.value)}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Adding..." : "Add Student ID"}
+          <div className="flex gap-2">
+            <Dialog open={isBulkDialogOpen} onOpenChange={setIsBulkDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Bulk Import CSV
                 </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Bulk Import Student IDs</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>CSV File Format</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Upload a CSV file with columns: student_id, student_name (optional)
+                    </p>
+                    <Button
+                      type="button"
+                      variant="link"
+                      onClick={downloadTemplate}
+                      className="p-0 h-auto"
+                    >
+                      Download Template
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="csv-file">Upload CSV</Label>
+                    <Input
+                      id="csv-file"
+                      type="file"
+                      accept=".csv"
+                      ref={fileInputRef}
+                      onChange={handleCSVUpload}
+                      disabled={isLoading}
+                    />
+                  </div>
+                  {isLoading && (
+                    <p className="text-sm text-muted-foreground">Processing...</p>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Student ID
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Student ID</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleAddStudentId} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="student-id">Student ID</Label>
+                    <Input
+                      id="student-id"
+                      placeholder="STU001"
+                      value={newStudentId}
+                      onChange={(e) => setNewStudentId(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="student-name">Student Name (Optional)</Label>
+                    <Input
+                      id="student-name"
+                      placeholder="John Doe"
+                      value={newStudentName}
+                      onChange={(e) => setNewStudentName(e.target.value)}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Adding..." : "Add Student ID"}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         <Card>
