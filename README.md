@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/ee6384bc-60e2-453d-b8df-c857e6d43695
+**URL**: https://broto-voice-box.lovable.app
 
 ## How can I edit this code?
 
