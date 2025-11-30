@@ -10,7 +10,7 @@ There are several ways of editing your application.
 
 **Use Lovable**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ee6384bc-60e2-453d-b8df-c857e6d43695) and start prompting.
+Simply visit the [Lovable Project](https://broto-voice-box.lovable.app) and start prompting.
 
 Changes made via Lovable will be committed automatically to this repo.
 
